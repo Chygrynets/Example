@@ -1,0 +1,143 @@
+﻿<div class="panel-body">
+  @* Створити новий матеріал *@
+  <div class="form__title">
+    Тип специфікації та класифікатор
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label for="specType" class="control-label">Оберіть тип специфікації</label>
+      <div class="controls" ng-class="{'has-error': vm.formname.specificationType.$error.required}">
+        <select class="form-control"
+                name="specificationType"
+                ng-model="vm.specificationType"
+                ng-options="specificationType.title for specificationType in vm.specificationTypes track by specificationType.id"
+                ng-change="vm.getClassificationList(vm.specificationType)"
+                required></select>
+      </div>
+    </div>
+
+    <div class="col-sm-6">
+      <label class="control-label">@L("Classificator")</label>
+      <div class="controls" ng-class="{'has-error': vm.formname.classification.$error.required}">
+        <input type="text" class="form-control" placeholder="Введіть назву класифікатора" name="classification"
+               ng-model="vm.classification"
+               ng-disabled="!vm.specificationType"
+               typeahead-focus-first="false"
+               uib-typeahead="classification as classification.title for classification in vm.classificationList | filter:$viewValue | limitTo:10"
+               typeahead-editable="false"
+               data-toggle="tooltip" title="Спершу оберіть тип специфікації"
+               required />
+      </div>
+    </div>
+  </div>
+
+  <div class="form__title">
+    Назва та код матеріалу
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label for="itemName" class="control-label">Назва матеріалу</label>
+      <div ng-class="{'has-error': vm.formname.materialName.$error.required }">
+        <input type="text" class="form-control" placeholder="Введіть назву матеріалу" name="materialName"
+               ng-model="vm.newMaterial"
+               ng-disabled="!vm.classification.id"
+               typeahead-focus-first="false"
+               uib-typeahead="material as material.matirialName for material in vm.getMaterialList($viewValue)"
+               typeahead-on-select="vm.getMaterialCharacteristics(vm.newMaterial)"
+               data-toggle="tooltip" title="Спершу оберіть тип специфікації та класифікатор"
+               required />
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <label for="itemNameSap" class="control-label">Номер матеріалу з SAP</label>
+      <div ng-class="{'has-error': vm.formname.materialCode.$error.required || !vm.formname.materialCode.$valid}">
+        <input type="text" class="form-control" name="materialCode"
+               ng-model="vm.newMaterial.matirialCode"
+               ng-disabled="!vm.newMaterial.matirialName || !vm.isSapUser"
+               ng-pattern="'\\d+'"
+               data-toggle="tooltip" title="Спершу оберіть матеріал по назві"
+               ng-required="vm.isSapUser" />
+        <div class="help-inline"
+             ng-messages="vm.formname.materialCode.$error" role="alert">
+          <span ng-message="pattern">@L("ShouldHaveOnlyDigits").</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="vm.newMaterial.matirialName">
+    <div class="form__title">
+      Опис матеріалу
+    </div>
+    <div ng-if="vm.materialSet.length > 0">
+      <div class="row" data-ng-repeat="material in vm.materialSet track by material.localId">
+        <div class="col-sm-8 col-xs-12">
+          <label for="descriptionName" class="control-label">Назва</label>
+          <div @*ng-class="{'has-error': formCreateItem.descriptionName.$error.required }"*@>
+            <input id="descriptionName" name="descriptionName" class="form-control"
+                   ng-model="material.name" />
+          </div>
+        </div>
+        @*<div class="col-sm-4 col-xs-7">
+            <label for="descriptionDataType" class="control-label">Тип даних</label>
+            <div ng-class="{'has-error': formCreateItem.characteristicType.$error.required }">
+              <select class="form-control" id="characteristicType" name="characteristicType"
+                      ng-model="material.characteristicType"
+                      ng-options="characteristic.id as characteristic.name for characteristic in material.characteristicType track by characteristic.id"></select>
+
+            </div>
+          </div>*@
+        <div class="col-sm-3 col-xs-6 checkbox__container_mt">
+          <label class="checkbox__label">
+            <input type="checkbox" ng-model="material.isRequred" />
+            <span class="checkbox__container__labelText">Обов'яз.</span>
+          </label>
+        </div>
+        <div class="col-sm-1 col-xs-6 checkbox__container_mt">
+          <button type="button" class="btn btn__close  pull-right"
+                  ng-click="vm.removeNewCharacteristic($index)">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="col-xs-12">
+          <textarea name="itemNameSap" class="form-control"
+                    data-toggle="tooltip" title="Перелік значень вводьте через . (крапку)"
+                    ng-model="material.characteristicEnumValue"
+                    placeholder="Введіть значення атрибута"
+                    rows="3">
+          </textarea>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <button type="button" class="btn btn-sm btn-info"
+                ng-click="vm.addNewCharacteristic()">
+          <i class="fa fa-plus"></i>
+          Додати атрибут
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="panel-footer">
+  <div class="row">
+    <div class="col-sm-12">
+      <button type="button" class="btn btn-success"
+              ng-disabled="!vm.formname.$valid || vm.newMaterial.matirialId"
+              ng-click="vm.createNewMaterial(vm.newMaterial, 0)">
+        Зберегти новий
+      </button>
+      <button type="button" class="btn btn-info"
+              ng-disabled="!vm.formname.$valid || !vm.newMaterial.matirialId"
+              ng-click="vm.createNewMaterial(vm.newMaterial, vm.newMaterial.matirialId)">
+        Зберегти зміни
+      </button>
+      <button type="button" class="btn btn-danger"
+              ng-disabled="!vm.formname.$valid || !vm.newMaterial.matirialId"
+              ng-click="vm.softDeleteMaterial()">
+        Видалити обраний
+      </button>
+    </div>
+  </div>
+</div>

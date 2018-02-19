@@ -1,0 +1,148 @@
+@model Auction.Web.Models.Auction.DetailsViewModel
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isParticipator = Model.Auction.MyCurrentBid != null;
+}
+
+<script type="text/javascript">
+    var auctionShared = {};
+    auctionShared.id = @Model.Auction.Id;
+    auctionShared.round = @Model.Auction.Round;
+    auctionShared.token = '@Model.Auction.Token';
+    auctionShared.isAdjPrice = '@Model.Auction.IsAdjPrice' == 'True';
+    auctionShared.isClosed =  '@Model.Auction.IsClosed' == 'True';
+    auctionShared.isParticipator =  '@isParticipator' == 'True';
+    auctionShared.isOwner = '@Model.Auction.IsMy' == 'True';    
+    auctionShared.timeToRoundComplete = @Model.TimeToRoundComplete;
+    auctionShared.minPrice = @Model.MinPrice;
+</script>
+
+@section scripts
+  {
+  <environment names="Development">
+    <script src="~/lib/webSocketManager/WebSocketManager.js" asp-append-version="true"></script>
+    <script src="~/js/views/auction/details.js" asp-append-version="true"></script>
+  </environment>
+  <environment names="Staging,Production">
+    <script src="~/lib/webSocketManager/WebSocketManager.js" asp-append-version="true"></script>
+    <script src="~/js/views/auction/details.min.js" asp-append-version="true"></script>
+  </environment>
+}
+
+<div>
+  <header class="header">
+    <div class="header__container">
+      <div class="header-item">
+        <i class="fa fa-2x fa-bars header__nav" id="headerMenu" aria-hidden="true"></i>
+        <div class="header__time-block">
+          <span class="timer"></span>
+          <span class="date"></span>
+        </div>
+      </div>
+      <i class="fa fa-flag header__lang" aria-hidden="true"></i>
+    </div>
+  </header>
+
+  <!--modal-->
+  <div class="modal" id="tenderInfoMenu">
+    <div class="modal-backdrop"></div>
+    <div class="modal__container">
+      <div class="modal__header">
+        @Model.Auction.Number
+        <span class="modal__btn-close" id="closeModal">&times;</span>
+      </div>
+      <div class="modal__content">
+        <span class="auction__title">
+          @Model.Auction.Title
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <section class="auction">
+    <div class="auction__container">
+      <!--status-->
+      <div class="auction__status">
+        @Model.StatusName
+      </div>
+      <!--number-->
+      <div class="auction__number">
+        @Model.Auction.Number
+      </div>
+      <!--title-->
+      <div class="auction__title">
+        @Model.Auction.Title
+      </div>
+
+      <!--description|items-->
+      @*<ul class="auction__lots">
+            <li class="auction__lot-item">1 item</li>
+            <li class="auction__lot-item">1 more item</li>
+            <li class="auction__lot-item">and 1 more item</li>
+            <li class="auction__lot-item">and also 1 item</li>
+            <li class="auction__lot-item">last item</li>
+        </ul>*@
+
+      @{
+          <div class="auction-bid" data-round="0">
+            <div class="auction-bid__round">
+              Початкові заявки
+            </div>
+            @Html.Partial("Partials/RoundBids", Model.Auction.RoundBids.ElementAt(0))
+          </div>
+
+          for (byte i = 1; i <= Model.Auction.Round; i++)
+          {
+              <div class="auction-bid" data-round="@i">
+                <div class="auction-bid__round">
+                  Раунд @i
+                </div>
+                @Html.Partial("Partials/RoundBids", Model.Auction.RoundBids.ElementAt(i))
+              </div>
+          }
+      }
+    </div>
+  </section>
+
+  @if (Model.Auction.MyCurrentBid != null && Model.Auction.Status == Auction.Entities.AuctionStatus.Bidding)
+  {
+      <footer class="footer">
+        <div class="footer__container">
+          <span>Ваша пропозиція <span id="bidAmountSpan">@Model.Auction.MyCurrentBid.AdjPrice</span> @Model.Auction.Value.CurrencyCode</span>
+          <span class="rate">
+            @if (Model.Auction.IsAdjPrice)
+            {
+                <label>Аванс</label>
+                <input id="bidAdvanceInput" class="rate__input" type="number" min="0" max="@Model.Auction.Value.Advance" value="@Model.Auction.MyCurrentBid.Advance" />
+                <label>Відтермінування</label>
+                <input id="bidDelayInput" class="rate__input" type="number" min="@Model.Auction.Value.Delay" max="90" value="@Model.Auction.MyCurrentBid.Delay" />
+            }
+            
+            <input id="bidAmountInput"
+                   data-id="@Model.Auction.MyCurrentBid.Id"
+                   data-token="@Model.Auction.MyCurrentBid.Token"
+                   data-step="@Model.Auction.Step"
+                   class="rate__input" type="number" step="@Model.Auction.Step" min="0" max="@Model.NextAmount" value="@Model.NextAmount" placeholder="Зробіть заявку" />
+            <span class="rate__btn-block">
+              <button id="updateBidBtn" class="rate__btn rate__btn_success">Зробити пропозицію</button>
+            </span>
+          </span>
+        </div>
+      </footer>
+  }
+
+  @if (Model.ShowAnnounceLastRoundBtn)
+  {
+      <footer class="footer">
+        <div class="footer__container">
+          <span class="rate">
+            <span class="rate__btn-block">
+              <button id="announceLastRoundBtn" class="rate__btn rate__btn_warn">Оголосити останній крок</button>
+            </span>
+          </span>
+        </div>
+      </footer>
+  }
+</div>

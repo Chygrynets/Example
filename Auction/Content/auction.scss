@@ -1,0 +1,292 @@
+﻿@import url('https://fonts.googleapis.com/css?family=Roboto');
+@import "auction/reset.scss";
+@import "auction/grid.scss";
+@import "auction/variables.scss";
+
+//-----------------------------------
+
+
+html, body {
+  height: 100%;
+  min-height: 100%;
+}
+
+.page {
+  font-family: $main-font;
+  font-weight: 500;
+  color: $darkgrey;
+
+
+  &__wrap {
+    display: flex;
+    flex-direction: column;
+    min-width: 320px;
+    max-width: 1920px;
+    margin: 0 auto;
+    height: 100vh;
+  }
+}
+
+
+.header {
+    width: 100%;
+    position: fixed;
+    background: $white;
+    color: $black;
+    height: 60px;
+    line-height: 60px;
+
+
+    &__container {
+        @include container();
+        min-height: 60px;
+        align-items: center;
+        border-bottom: 1px solid $darkgrey;
+    }
+
+    &-item {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    &__nav,
+    &__lang {
+        padding: 0 10px;
+        cursor: pointer;
+    }
+}
+
+.auction {
+    color: $black;
+    padding: 75px 50px 90px 50px;
+
+    &__container {
+        @include container();
+        flex-direction: column;
+        //padding: 0 50px;
+    }
+
+    &__status {
+        font-size: 24px;
+        color: $red;
+        @include bottom-indent();
+    }
+
+    &__number {
+        @include bottom-indent();
+        font-size: 30px;
+        line-height: 1.4;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid $lightgrey;
+    }
+
+    &__title {
+        font-size: 18px;
+        @include bottom-indent();
+    }
+
+    &__lot-item {
+        margin-left: 18px;
+        padding-bottom: 5px;
+        list-style-type: circle;
+    }
+
+    &-bid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        &__round {
+            @extend .auction__title;
+            font-weight: 900;
+        }
+
+        &__offer {
+            @include container();
+            align-items: center;
+            padding: 15px;
+            border: 1px solid $lightgrey;
+            border-radius: 5px;
+            @include bottom-indent();
+
+            @media #{$_sm} {
+                flex-direction: column;
+            }
+
+            &_current-user {
+                background-color: rgba($lightgrey, .25);
+            }
+
+
+            &-provider {
+                @include container(flex-start, nowrap);
+                align-items: center;
+                @include col(7);
+                margin: 0;
+                padding: 0;
+
+                @media #{$_sm} {
+                    @include col(12);
+                    @include bottom-indent();
+                }
+
+                &-name {
+                    @include word-wrap();
+                    display: inline-flex;
+                    padding: 0 10px;
+                }
+            }
+
+            &-stage-icon {
+                display: inline-flex;
+                flex-shrink: 0;
+                background-size: 46px 46px;
+                background-image: url(../icons/future_stage.png);
+                background-repeat: no-repeat;
+                background-position: 50% 50%;
+                height: 48px;
+                width: 48px;
+
+                &_past-round {
+                    background-image: url(../icons/past_round_stage.png);
+                }
+            }
+
+            &-price {
+                @include container(space-around);
+                @include col(5);
+                margin: 0;
+                padding: 15px;
+                border: 1px solid $lightgrey;
+                border-radius: 5px;
+
+                @media #{$_sm} {
+                    @include col(12);
+                }
+
+                @media #{$_xs} {
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                &_lowest {
+                    background-color: rgba($red, .7);
+                }
+            }
+        }
+    }
+}
+
+.footer {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  color: $black;
+  background-color: $white;
+  height: 90px;
+  line-height: 30px;
+
+  @media #{$_xs} {
+    height: 120px;
+  }
+
+  &__container {
+    @include container();
+    padding-top: 5px;
+    flex-direction: column;
+    align-items: center;
+    border-top: 1px solid $darkgrey;
+  }
+}
+
+.rate {
+    display: flex;
+
+    @media #{$_xs} {
+        flex-direction: column;
+    }
+
+    &__input {
+        padding: 6px 12px;
+        border: 1px solid $lightgrey;
+        border-radius: 5px;
+    }
+
+    &__btn {
+        padding: 6px 12px;
+        text-align: center;
+        vertical-align: middle;
+        white-space: nowrap;
+        border: 1px solid $lightgrey;
+        border-radius: 5px;
+
+        &_warn:hover {
+            background-color: $red;
+        }
+
+        &_success:hover {
+            background-color: $green;
+        }
+    }
+
+    &__btn-block {
+        padding: 0 15px;
+
+        @media #{$_xs} {
+            padding: 10px 0;
+        }
+    }
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  //z-index: 1;
+  left: 0;
+  top: 61px;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba($black, 0.4);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    @include bottom-indent();
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+
+  &__container {
+    display: flex;
+    position: fixed;
+    flex-direction: column;
+    top: 61px;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    //margin-top: 61px;
+    padding: 20px 10px;
+    background-color: $white;
+    border-right: 1px solid $lightgrey;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__btn {
+    &-close {
+      color: $lightgrey;
+      &:hover,
+      &:focus {
+        color: $black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+    }
+  }
+}

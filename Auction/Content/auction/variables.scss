@@ -1,0 +1,27 @@
+﻿/*Набор основных цветов.
+  Для Галнафтогаза добавлен зеленый.*/
+
+$red: rgba(233, 79, 69, 1);
+$green: rgb(121, 182, 62);
+$darkgrey: rgba(51, 51, 51, 1);
+$lightgrey: rgba(221, 221, 221, 1);
+$black: rgba(0, 0, 0, 1);
+$white: rgba(255, 255, 255, 1);
+
+$main-font: "Roboto", "Helvetica", "Arial", sans-serif;
+
+/*Миксин для длинных названий*/
+@mixin word-wrap() {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  -ms-word-break: break-all;
+  word-break: break-word;
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+@mixin bottom-indent() {
+    margin-bottom: 15px;
+}
